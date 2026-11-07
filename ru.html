@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Квиз: старые слова Даля</title>
+<style>
+  body {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    background: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+  }
+  .card {
+    background: #fff;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 2px solid #333;
+    border-radius: 10px;
+  }
+  h1 {
+    font-size: 24px;
+    text-align: center;
+    color: #333;
+    margin-top: 0;
+  }
+  .progress {
+    text-align: center;
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 15px;
+  }
+  .old-word {
+    font-size: 32px;
+    text-align: center;
+    color: #222;
+    font-weight: bold;
+    margin: 10px 0 5px;
+  }
+  .word-hint {
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 20px;
+  }
+  .option {
+    display: block;
+    width: 100%;
+    font-family: inherit;
+    font-size: 16px;
+    padding: 10px;
+    margin-bottom: 8px;
+    border: 2px solid #666;
+    border-radius: 6px;
+    background: #f9f9f9;
+    cursor: pointer;
+    text-align: left;
+  }
+  .option:hover:not(:disabled) {
+    background: #e8e8e8;
+  }
+  .option.correct {
+    background: #c8f0c8;
+    border-color: #2a7a2a;
+  }
+  .option.wrong {
+    background: #f0c8c8;
+    border-color: #a02020;
+  }
+  .option:disabled {
+    cursor: default;
+  }
+  .hint-btn {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 6px 14px;
+    border: 2px solid #888;
+    border-radius: 6px;
+    background: #eee;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .hint-btn:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+  .hint-text {
+    font-size: 14px;
+    color: #444;
+    background: #fffbe0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px;
+    margin-top: 8px;
+    display: none;
+  }
+  .hint-text.show {
+    display: block;
+  }
+  .feedback {
+    font-size: 16px;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    min-height: 20px;
+  }
+  .feedback.ok {
+    background: #e0f8e0;
+    color: #1a5a1a;
+    border: 1px solid #2a7a2a;
+  }
+  .feedback.bad {
+    background: #f8e0e0;
+    color: #7a1a1a;
+    border: 1px solid #a02020;
+  }
+  .feedback .explain {
+    display: block;
+    font-size: 14px;
+    margin-top: 6px;
+    color: #444;
+  }
+  .next-btn {
+    font-family: inherit;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-top: 12px;
+    border: 2px solid #333;
+    border-radius: 6px;
+    background: #dde8ff;
+    cursor: pointer;
+    display: none;
+  }
+  .next-btn.show {
+    display: inline-block;
+  }
+  .next-btn:hover {
+    background: #c8d8ff;
+  }
+  .final {
+    display: none;
+    text-align: center;
+  }
+  .final.show {
+    display: block;
+  }
+  .final-score {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  .final-comment {
+    font-size: 15px;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  .restart-btn {
+    font-family: inherit;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: 2px solid #333;
+    border-radius: 6px;
+    background: #dde8ff;
+    cursor: pointer;
+  }
+  .restart-btn:hover {
+    background: #c8d8ff;
+  }
+  .hidden {
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Квиз: старые слова Даля</h1>
+
+  <div id="quizScreen">
+    <div class="progress" id="progress">Вопрос 1 из 5</div>
+
+    <div class="old-word" id="oldWord">Обаять</div>
+    <div class="word-hint" id="wordHint">(старое слово из словаря Даля)</div>
+
+    <div id="options"></div>
+
+    <button class="hint-btn" id="hintBtn">Подсказка</button>
+    <div class="hint-text" id="hintText"></div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <button class="next-btn" id="nextBtn">Дальше</button>
+  </div>
+
+  <div class="final" id="finalScreen">
+    <div class="final-score" id="finalScore">Ты набрал 0 из 5</div>
+    <div class="final-comment" id="finalComment"></div>
+    <button class="restart-btn" id="restartBtn">Пройти ещё раз</button>
+  </div>
+</div>
+
+<script>
+  var questions = [
+    {
+      oldWord: "Обаять",
+      wordHint: "(слово из словаря Даля)",
+      options: ["Обмануть (облапошить)", "Очаровать", "Обидеть"],
+      correctIndex: 0,
+      hint: "Это слово про обман словами.",
+      explanation: "«Обаять» значило обмануть, облапошить."
+    },
+    {
+      oldWord: "Вабить",
+      wordHint: "(слово из словаря Даля)",
+      options: ["Варить варенье", "Заманить (сманить)", "Вязать варежки"],
+      correctIndex: 1,
+      hint: "Так раньше говорили про приманку для птиц.",
+      explanation: "«Вабить» — заманивать, сманивать."
+    },
+    {
+      oldWord: "Кабушка",
+      wordHint: "(слово из словаря Даля)",
+      options: ["Маленькая кабина", "Творожный шарик (сырок)", "Кнопка на рубашке"],
+      correctIndex: 1,
+      hint: "Так раньше называли творожный шарик.",
+      explanation: "«Кабушка» — это творожный шарик, сырок."
+    },
+    {
+      oldWord: "Абатур",
+      wordHint: "(слово из словаря Даля)",
+      options: ["Упрямец (неслух)", "Абажур для лампы", "Богатырь"],
+      correctIndex: 0,
+      hint: "Так называли человека, который всё делает по-своему.",
+      explanation: "«Абатур» — упрямец, неслух."
+    },
+    {
+      oldWord: "Багряник",
+      wordHint: "(слово из словаря Даля)",
+      options: ["Красильщик ткани", "Праздничный пирог", "Церцис (иудино дерево)"],
+      correctIndex: 2,
+      hint: "Это растение с розовыми цветами.",
+      explanation: "«Багряник» — церцис, или иудино дерево."
+    }
+  ];
+
+  var currentIndex = 0;
+  var score = 0;
+  var answered = false;
+
+  var progressEl = document.getElementById('progress');
+  var oldWordEl = document.getElementById('oldWord');
+  var wordHintEl = document.getElementById('wordHint');
+  var optionsEl = document.getElementById('options');
+  var hintBtn = document.getElementById('hintBtn');
+  var hintTextEl = document.getElementById('hintText');
+  var feedbackEl = document.getElementById('feedback');
+  var nextBtn = document.getElementById('nextBtn');
+  var quizScreen = document.getElementById('quizScreen');
+  var finalScreen = document.getElementById('finalScreen');
+  var finalScoreEl = document.getElementById('finalScore');
+  var finalCommentEl = document.getElementById('finalComment');
+  var restartBtn = document.getElementById('restartBtn');
+
+  function loadQuestion() {
+    answered = false;
+    var q = questions[currentIndex];
+
+    progressEl.textContent = 'Вопрос ' + (currentIndex + 1) + ' из ' + questions.length;
+    oldWordEl.textContent = q.oldWord;
+    wordHintEl.textContent = q.wordHint;
+
+    hintTextEl.textContent = '';
+    hintTextEl.classList.remove('show');
+    hintBtn.disabled = false;
+
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+    nextBtn.classList.remove('show');
+    nextBtn.textContent = currentIndex === questions.length - 1 ? 'Показать результат' : 'Дальше';
+
+    optionsEl.innerHTML = '';
+    for (var i = 0; i < q.options.length; i++) {
+      (function(index) {
+        var btn = document.createElement('button');
+        btn.className = 'option';
+        btn.textContent = q.options[index];
+        btn.addEventListener('click', function() { selectOption(index); });
+        optionsEl.appendChild(btn);
+      })(i);
+    }
+  }
+
+  function selectOption(selectedIndex) {
+    if (answered) return;
+    answered = true;
+
+    var q = questions[currentIndex];
+    var allBtns = optionsEl.querySelectorAll('.option');
+    var i;
+
+    for (i = 0; i < allBtns.length; i++) {
+      allBtns[i].disabled = true;
+    }
+    hintBtn.disabled = true;
+
+    for (i = 0; i < allBtns.length; i++) {
+      if (i === q.correctIndex) {
+        allBtns[i].classList.add('correct');
+      } else if (i === selectedIndex) {
+        allBtns[i].classList.add('wrong');
+      }
+    }
+
+    if (selectedIndex === q.correctIndex) {
+      score++;
+      feedbackEl.innerHTML = 'Верно!<span class="explain">' + q.explanation + '</span>';
+      feedbackEl.className = 'feedback ok';
+    } else {
+      feedbackEl.innerHTML = 'Неверно. Правильный ответ: «' + q.options[q.correctIndex] + '»<span class="explain">' + q.explanation + '</span>';
+      feedbackEl.className = 'feedback bad';
+    }
+
+    nextBtn.classList.add('show');
+  }
+
+  function goNext() {
+    if (!answered) return;
+    currentIndex++;
+    if (currentIndex < questions.length) {
+      loadQuestion();
+    } else {
+      showFinal();
+    }
+  }
+
+  function showFinal() {
+    quizScreen.classList.add('hidden');
+    finalScreen.classList.add('show');
+
+    finalScoreEl.textContent = 'Ты набрал ' + score + ' из ' + questions.length;
+
+    var comment;
+    if (score === 5) {
+      comment = 'Отлично! Ты хорошо знаешь старые слова.';
+    } else if (score >= 3) {
+      comment = 'Хорошо! Большинство слов ты угадал.';
+    } else if (score >= 1) {
+      comment = 'Неплохо, но можно ещё потренироваться.';
+    } else {
+      comment = 'Зато теперь ты знаешь пять новых старых слов.';
+    }
+    finalCommentEl.textContent = comment;
+  }
+
+  function restartQuiz() {
+    currentIndex = 0;
+    score = 0;
+    answered = false;
+
+    finalScreen.classList.remove('show');
+    quizScreen.classList.remove('hidden');
+
+    loadQuestion();
+  }
+
+  hintBtn.addEventListener('click', function() {
+    var q = questions[currentIndex];
+    hintTextEl.textContent = q.hint;
+    hintTextEl.classList.add('show');
+    hintBtn.disabled = true;
+  });
+
+  nextBtn.addEventListener('click', goNext);
+  restartBtn.addEventListener('click', restartQuiz);
+
+  loadQuestion();
+</script>
+
+</body>
+</html>
