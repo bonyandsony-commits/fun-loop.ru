@@ -180,7 +180,7 @@
     <div class="progress" id="progress">Вопрос 1 из 5</div>
 
     <div class="old-word" id="oldWord">Обаять</div>
-    <div class="word-hint" id="wordHint">(старое слово из словаря Даля)</div>
+    <div class="word-hint" id="wordHint">старое слово из словаря Даля</div>
 
     <div id="options"></div>
 
@@ -203,41 +203,56 @@
   var questions = [
     {
       oldWord: "Обаять",
-      wordHint: "(слово из словаря Даля)",
-      options: ["Обмануть (облапошить)", "Очаровать", "Обидеть"],
-      correctIndex: 0,
+      wordHint: "старое слово из словаря Даля",
+      options: [
+        { text: "Обмануть", correct: true },
+        { text: "Очаровать", correct: false },
+        { text: "Обидеть", correct: false }
+      ],
       hint: "Это слово про обман словами.",
       explanation: "«Обаять» значило обмануть, облапошить."
     },
     {
       oldWord: "Вабить",
-      wordHint: "(слово из словаря Даля)",
-      options: ["Варить варенье", "Заманить (сманить)", "Вязать варежки"],
-      correctIndex: 1,
+      wordHint: "старое слово из словаря Даля",
+      options: [
+        { text: "Варить", correct: false },
+        { text: "Заманить", correct: true },
+        { text: "Вязать", correct: false }
+      ],
       hint: "Так раньше говорили про приманку для птиц.",
       explanation: "«Вабить» — заманивать, сманивать."
     },
     {
       oldWord: "Кабушка",
-      wordHint: "(слово из словаря Даля)",
-      options: ["Маленькая кабина", "Творожный шарик (сырок)", "Кнопка на рубашке"],
-      correctIndex: 1,
+      wordHint: "старое слово из словаря Даля",
+      options: [
+        { text: "Кабина", correct: false },
+        { text: "Творожный шарик", correct: true },
+        { text: "Кнопка", correct: false }
+      ],
       hint: "Так раньше называли творожный шарик.",
       explanation: "«Кабушка» — это творожный шарик, сырок."
     },
     {
       oldWord: "Абатур",
-      wordHint: "(слово из словаря Даля)",
-      options: ["Упрямец (неслух)", "Абажур для лампы", "Богатырь"],
-      correctIndex: 0,
+      wordHint: "старое слово из словаря Даля",
+      options: [
+        { text: "Упрямец", correct: true },
+        { text: "Абажур", correct: false },
+        { text: "Богатырь", correct: false }
+      ],
       hint: "Так называли человека, который всё делает по-своему.",
       explanation: "«Абатур» — упрямец, неслух."
     },
     {
       oldWord: "Багряник",
-      wordHint: "(слово из словаря Даля)",
-      options: ["Красильщик ткани", "Праздничный пирог", "Церцис (иудино дерево)"],
-      correctIndex: 2,
+      wordHint: "старое слово из словаря Даля",
+      options: [
+        { text: "Красильщик", correct: false },
+        { text: "Пирог", correct: false },
+        { text: "Церцис", correct: true }
+      ],
       hint: "Это растение с розовыми цветами.",
       explanation: "«Багряник» — церцис, или иудино дерево."
     }
@@ -261,6 +276,13 @@
   var finalCommentEl = document.getElementById('finalComment');
   var restartBtn = document.getElementById('restartBtn');
 
+  function getCorrectIndex(q) {
+    for (var i = 0; i < q.options.length; i++) {
+      if (q.options[i].correct) return i;
+    }
+    return -1;
+  }
+
   function loadQuestion() {
     answered = false;
     var q = questions[currentIndex];
@@ -283,7 +305,7 @@
       (function(index) {
         var btn = document.createElement('button');
         btn.className = 'option';
-        btn.textContent = q.options[index];
+        btn.textContent = q.options[index].text;
         btn.addEventListener('click', function() { selectOption(index); });
         optionsEl.appendChild(btn);
       })(i);
@@ -295,6 +317,7 @@
     answered = true;
 
     var q = questions[currentIndex];
+    var correctIdx = getCorrectIndex(q);
     var allBtns = optionsEl.querySelectorAll('.option');
     var i;
 
@@ -304,19 +327,19 @@
     hintBtn.disabled = true;
 
     for (i = 0; i < allBtns.length; i++) {
-      if (i === q.correctIndex) {
+      if (i === correctIdx) {
         allBtns[i].classList.add('correct');
       } else if (i === selectedIndex) {
         allBtns[i].classList.add('wrong');
       }
     }
 
-    if (selectedIndex === q.correctIndex) {
+    if (selectedIndex === correctIdx) {
       score++;
       feedbackEl.innerHTML = 'Верно!<span class="explain">' + q.explanation + '</span>';
       feedbackEl.className = 'feedback ok';
     } else {
-      feedbackEl.innerHTML = 'Неверно. Правильный ответ: «' + q.options[q.correctIndex] + '»<span class="explain">' + q.explanation + '</span>';
+      feedbackEl.innerHTML = 'Неверно. Правильный ответ: «' + q.options[correctIdx].text + '»<span class="explain">' + q.explanation + '</span>';
       feedbackEl.className = 'feedback bad';
     }
 
